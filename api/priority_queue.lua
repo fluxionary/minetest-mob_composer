@@ -49,7 +49,7 @@ end
 
 local function cut(node)
 	local node2 = node.parent
-	if node2.child == self then
+	if node2.child == node then
 		node2.child = node.sibling
 	else
 		node2 = node2.child
@@ -64,43 +64,44 @@ local function cut(node)
 	node.sibling = nil
 end
 
-local function extract(node)
-	local children = {}
-	local node2 = node.child
-	local sibling = node2.sibling
+-- TODO what was this for and why is it not used?
+--local function extract(node)
+--	local children = {}
+--	local node2 = node.child
+--	local sibling = node2.sibling
+--
+--	while node2 and sibling do
+--		local next = sibling.sibling
+--		node2.parent = nil
+--		node2.sibling = nil
+--		sibling.parent = nil
+--		sibling.sibling = nil
+--		table.insert(children, meld(node2, sibling))
+--		node2 = next
+--		sibling = node2.sibling
+--	end
+--
+--	if node2 then
+--		table.insert(children, node2)
+--	end
+--
+--	if #children == 0 then
+--		return {}
+--	end
+--
+--	local root = children[#children]
+--	for i = #children - 1, 1, -1 do
+--		root = meld(root, children[i])
+--	end
+--
+--	root.parent = nil
+--
+--	return root
+--end
 
-	while node2 and sibling do
-		local next = sibling.sibling
-		node2.parent = nil
-		node2.sibling = nil
-		sibling.parent = nil
-		sibling.sibling = nil
-		table.insert(children, meld(node2, sibling))
-		node2 = next
-		sibling = node2.sibling
-	end
+local heap_class = mob_composer.util.class()
 
-	if node2 then
-		table.insert(children, node2)
-	end
-
-	if #children == 0 then
-		return {}
-	end
-
-	local root = children[#children]
-	for i = #children - 1, 1, -1 do
-		root = meld(root, children[i])
-	end
-
-	root.parent = nil
-
-	return root
-end
-
-local heap_class = mob_automata.util.class()
-
-function heap_class:_new()
+function heap_class:_init()
 	self._max_node = {}
 	self._nodes_by_value = {}
 	self._size = 0
@@ -181,4 +182,4 @@ function heap_class:set_priority(value, priority)
 end
 
 
-mob_automata.api.queue_class = heap_class
+mob_composer.api.queue_class = heap_class

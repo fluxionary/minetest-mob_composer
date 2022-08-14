@@ -3,7 +3,7 @@ local modpath = minetest.get_modpath(modname)
 
 local S = minetest.get_translator(modname)
 
-mob_automata = {
+mob_composer = {
 	modname = modname,
 	modpath = modpath,
 	mod_storage = minetest.get_mod_storage(),
@@ -21,9 +21,8 @@ mob_automata = {
 	end,
 }
 
-cottages.dofile("settings")
-cottages.dofile("util")
-cottages.dofile("api", "init")
+mob_composer.dofile("settings")
+mob_composer.dofile("util")
+mob_composer.dofile("api", "init")
 
-
-self.mod_storage = nil
+mob_composer.mod_storage = nil

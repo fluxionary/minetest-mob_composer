@@ -1,4 +1,4 @@
-std = "lua51+luajit+minetest+mob_automata"
+std = "lua51+luajit+minetest+mob_composer"
 unused_args = false
 max_line_length = 120
 
@@ -21,8 +21,8 @@ stds.minetest = {
 	}
 }
 
-stds.mob_automata = {
+stds.mob_composer = {
 	globals = {
-		"mob_automata",
+		"mob_composer",
 	},
 }

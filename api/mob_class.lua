@@ -1,12 +1,12 @@
-local api = mob_automata.api
+local api = mob_composer.api
 
-local class = mob_automata.util.class
+local class = mob_composer.util.class
 
 local properties_class = api.properties_class
 
 local mob_class = class(properties_class)
 
-function mob_class:_new(object)
+function mob_class:_init(object)
 	self._object = object
 
 	local luaentity = object:get_luaentity()
@@ -26,13 +26,11 @@ function mob_class:_new(object)
 		self._id = id
 	end
 
-	properties_class._new(self, object)
+	properties_class._init(self, object)
 end
 
 function mob_class:get_entity_definition(overrides)
-	local def = {
-
-	}
+	error("todo")
 end
 
 function mob_class:register_mob(name, overrides)

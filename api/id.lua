@@ -1,5 +1,5 @@
-local api = mob_automata
-local mod_storage = mob_automata.mod_storage
+local api = mob_composer
+local mod_storage = mob_composer.mod_storage
 
 local id = mod_storage:get_int("id")
 

@@ -1,3 +1,3 @@
-mob_automata.api = {}
+mob_composer.api = {}
 
-mob_automata.dofile("api", "mob_base")
+mob_composer.dofile("api", "mob_base")

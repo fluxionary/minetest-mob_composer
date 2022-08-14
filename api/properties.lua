@@ -1,6 +1,6 @@
-local api = mob_automata.api
-local class = mob_automata.util.class
-local mod_storage = mob_automata.mod_storage
+local api = mob_composer.api
+local class = mob_composer.util.class
+local mod_storage = mob_composer.mod_storage
 
 local object_properties = {
 	hp_max = true,
@@ -40,7 +40,7 @@ local object_properties = {
 
 local properties_class = class()
 
-function properties_class:__new(object)
+function properties_class:_init(object)
 	self._object = object
 	self._id = object:get_luaentity()._id
 end
@@ -70,7 +70,6 @@ function properties_class:get(key)
 		return v
 	end
 
-	local value
 	if object_properties[key] then
 		local properties = self._object:get_properties()
 		return properties[key]
@@ -79,9 +78,6 @@ function properties_class:get(key)
 		key = ("%i.%s"):format(self._id, key)
 		return mod_storage:get(key)
 	end
-
-	self[key] = value
-	return value ~= nil
 end
 
 function properties_class:get_string(key)
@@ -90,7 +86,6 @@ function properties_class:get_string(key)
 		return v
 	end
 
-	local value
 	if object_properties[key] then
 		local properties = self._object:get_properties()
 		return tostring(properties[key])
@@ -99,9 +94,6 @@ function properties_class:get_string(key)
 		key = ("%i.%s"):format(self._id, key)
 		return mod_storage:get_string(key)
 	end
-
-	self[key] = value
-	return value ~= nil
 end
 
 function properties_class:get_int(key)
@@ -110,7 +102,6 @@ function properties_class:get_int(key)
 		return v
 	end
 
-	local value
 	if object_properties[key] then
 		local properties = self._object:get_properties()
 		return math.floor(tonumber(properties[key]))
@@ -119,9 +110,6 @@ function properties_class:get_int(key)
 		key = ("%i.%s"):format(self._id, key)
 		return mod_storage:get_int(key)
 	end
-
-	self[key] = value
-	return value ~= nil
 end
 
 function properties_class:get_float(key)
@@ -130,7 +118,6 @@ function properties_class:get_float(key)
 		return v
 	end
 
-	local value
 	if object_properties[key] then
 		local properties = self._object:get_properties()
 		return tonumber(properties[key])
@@ -139,9 +126,6 @@ function properties_class:get_float(key)
 		key = ("%i.%s"):format(self.__id, key)
 		return mod_storage:get_float(key)
 	end
-
-	self[key] = value
-	return value ~= nil
 end
 
 function properties_class:set_string(key, value)

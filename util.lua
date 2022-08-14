@@ -19,7 +19,7 @@ function util.class(...)
     function class:__call(...)
         local obj = setmetatable({}, class)
         if obj._new then
-            obj:_new(...)
+            obj:_init(...)
         end
         return obj
     end
@@ -41,4 +41,4 @@ function util.class(...)
     return class
 end
 
-mob_automata.util = util
+mob_composer.util = util
