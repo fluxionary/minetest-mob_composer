@@ -1,28 +1,31 @@
 local util = {}
 
 function util.class(...)
-    local class = {}
-	class.__index = class
+	local meta = {
+		__call = function(class, ...)
+	        local obj = setmetatable({}, class)
+	        if obj._init then
+	            obj:_init(...)
+	        end
+	        return obj
+	    end
+	}
 
 	local parents = {...}
 	if #parents > 0 then
-		setmetatable(class, {__index = function(self, key)
+		meta.__index = function(self, key)
 			for i = #parents, 1, -1 do
 				local v = parents[i][key]
 				if v then
 					return v
 				end
 			end
-		end})
+		end
 	end
 
-    function class:__call(...)
-        local obj = setmetatable({}, class)
-        if obj._new then
-            obj:_init(...)
-        end
-        return obj
-    end
+    local class = {}
+	class.__index = class
+	setmetatable(class, meta)
 
 	function class:is_a(class2)
 		if class == class2 then

@@ -1,5 +1,3 @@
-
-
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.3.0
@@ -17,5 +15,5 @@ repos:
         name: luacheck
         language: system
         entry: luacheck
-        types: [ lua ]
-        args: [ -q ]
+        types: [lua]
+        args: [-q]
