@@ -1,12 +1,12 @@
 local api = mob_composer.api
 
-local class = mob_composer.util.class
+local class = futil.class
 
 local properties_class = api.properties_class
 
-local mob_class = class(properties_class)
+local Mob = class(properties_class)
 
-function mob_class:_init(object)
+function Mob:_init(object)
 	self._object = object
 
 	local luaentity = object:get_luaentity()
@@ -29,12 +29,12 @@ function mob_class:_init(object)
 	properties_class._init(self, object)
 end
 
-function mob_class:get_entity_definition(overrides)
+function Mob:get_entity_definition(overrides)
 	error("todo")
 end
 
-function mob_class:register_mob(name, overrides)
+function Mob:register_mob(name, overrides)
 	minetest.register_entity(name, self:get_entity_definition(overrides))
 end
 
-api.mob_base = mob_class
+api.Mob = Mob

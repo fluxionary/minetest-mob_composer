@@ -1,5 +1,5 @@
 local api = mob_composer.api
-local class = mob_composer.util.class
+local class = futil.class
 local mod_storage = mob_composer.mod_storage
 
 local object_properties = {
@@ -38,14 +38,14 @@ local object_properties = {
 	show_on_minimap = true,
 }
 
-local properties_class = class()
+local Properties = class()
 
-function properties_class:_init(object)
+function Properties:_init(object)
 	self._object = object
 	self._id = object:get_luaentity()._id
 end
 
-function properties_class:contains(key)
+function Properties:contains(key)
 	if self[key] ~= nil then
 		return true
 	end
@@ -64,7 +64,7 @@ function properties_class:contains(key)
 	return value ~= nil
 end
 
-function properties_class:get(key)
+function Properties:get(key)
 	local v = self[key]
 	if v ~= nil then
 		return v
@@ -80,7 +80,7 @@ function properties_class:get(key)
 	end
 end
 
-function properties_class:get_string(key)
+function Properties:get_string(key)
 	local v = self[key]
 	if v ~= nil then
 		return v
@@ -96,7 +96,7 @@ function properties_class:get_string(key)
 	end
 end
 
-function properties_class:get_int(key)
+function Properties:get_int(key)
 	local v = self[key]
 	if v ~= nil then
 		return v
@@ -112,7 +112,7 @@ function properties_class:get_int(key)
 	end
 end
 
-function properties_class:get_float(key)
+function Properties:get_float(key)
 	local v = self[key]
 	if v ~= nil then
 		return v
@@ -128,7 +128,7 @@ function properties_class:get_float(key)
 	end
 end
 
-function properties_class:set_string(key, value)
+function Properties:set_string(key, value)
 	value = tostring(value)
 	if object_properties[key] then
 		local properties = self._object:get_properties()
@@ -142,7 +142,7 @@ function properties_class:set_string(key, value)
 	self[key] = value
 end
 
-function properties_class:set_int(key, value)
+function Properties:set_int(key, value)
 	if object_properties[key] then
 		local properties = self._object:get_properties()
 		properties[key] = math.floor(tonumber(value))
@@ -154,7 +154,7 @@ function properties_class:set_int(key, value)
 	end
 end
 
-function properties_class:set_float(key, value)
+function Properties:set_float(key, value)
 	if object_properties[key] then
 		local properties = self._object:get_properties()
 		properties[key] = tonumber(value)
@@ -166,4 +166,4 @@ function properties_class:set_float(key, value)
 	end
 end
 
-api.properties_class = properties_class
+api.Properties = Properties

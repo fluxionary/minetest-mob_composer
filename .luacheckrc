@@ -25,4 +25,8 @@ stds.mob_composer = {
 	globals = {
 		"mob_composer",
 	},
+	read_globals = {
+		"futil",
+		"minetest",
+	},
 }
