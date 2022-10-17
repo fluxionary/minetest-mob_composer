@@ -4,6 +4,7 @@ thoughts:
 * a mob is composed of traits
 * traits are like "sees", "wanders", "tames", "suffocates"
 * defining a mob is done by defining individual traits
+
 * a mob will be engaged in one action at a time - this defines its state
 * states are like "moving", "interacting w/ world", "interacting w/ object"
 * state is recomputed at the start of every (every n?) ticks

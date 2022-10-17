@@ -1,3 +1,5 @@
+local f = string.format
+
 local modname = minetest.get_current_modname()
 local modpath = minetest.get_modpath(modname)
 
@@ -13,7 +15,7 @@ mob_composer = {
 	},
 
 	log = function(level, messagefmt, ...)
-		return minetest.log(level, ("[%s] %s"):format(modname, messagefmt:format(...)))
+		return minetest.log(level, f("[%s] %s", modname, f(messagefmt, ...)))
 	end,
 
 	dofile = function(...)

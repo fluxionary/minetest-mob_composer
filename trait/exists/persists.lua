@@ -1,0 +1,2 @@
+-- everything must be `static_save = false` until at least its second server step, to avoid saving entities
+-- before the ID record is updated.
