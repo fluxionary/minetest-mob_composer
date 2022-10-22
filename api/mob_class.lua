@@ -5,6 +5,10 @@ local serialize = minetest.serialize
 
 local class = futil.class
 local identity = futil.functional.identity
+local is_property_key = futil.is_property_key
+local is_valid_property_value = futil.is_valid_property_value
+
+local PairingHeap = futil.PairingHeap
 
 local api = mob_composer.api
 local log = mob_composer.log
@@ -63,7 +67,7 @@ function Mob:on_activate(staticdata, dtime_s)
         return
     end
 
-    local id, properties, armor_groups, nametag_attributes, attributes = unpack(deserialize(staticdata))
+    local id, properties, armor_groups, nametag_attributes, serialized_attributes = unpack(deserialize(staticdata))
 
     if not id then
         log("warning", "attempt to initialize mob of type %q w/out an id", self.name or "nil")
@@ -78,8 +82,6 @@ function Mob:on_activate(staticdata, dtime_s)
     end
 
     api.entity_by_mob_id[id] = self
-
-    self.attributes = {}
 
     if not properties then
         self._initializing = true
@@ -97,6 +99,8 @@ function Mob:on_activate(staticdata, dtime_s)
         object:set_nametag_attributes(nametag_attributes)
     end
 
+    self.attributes = {}
+
     self._on_deactivates = {}
     self._on_steps = {}
     self._on_punches = {}
@@ -106,15 +110,29 @@ function Mob:on_activate(staticdata, dtime_s)
     self._on_detach_childs = {}
     self._on_detaches = {}
 
-    -- note: traits[1] == Mob
+    self.action_queue = PairingHeap()
+
+    self.state = "stand"
+    self.state_queue = PairingHeap()
+    self.state_queue:set_priority("stand", 0)
+
     local traits = getmetatable(self)._parents
 
     for i = 1, #traits do
-        local parent = traits[i]
-        if parent._init then
-            parent._init(self, attributes, dtime_s)
+        local trait = traits[i]
+        if trait._init then
+            if i == 1 then
+                -- note: traits[1] == Mob
+                trait._init(self, id)
+
+            else
+                -- traits are responsible for registering and initializing their own attributes
+                trait._init(self, serialized_attributes, dtime_s)
+            end
         end
     end
+
+    self._initializing = false
 end
 
 function Mob:on_deactivate(removal)
@@ -124,9 +142,10 @@ function Mob:on_deactivate(removal)
     end
 
     api.entity_by_mob_id[self._id] = nil
-    --if removal and not self.is_duplicate then
-    --    -- wipe backed-up properties
-    --end
+    if removal and not self.is_duplicate then
+        -- wipe backed-up properties
+        futil.functional.noop()
+    end
 end
 
 function Mob:register_on_deactivate(callback)
@@ -134,6 +153,22 @@ function Mob:register_on_deactivate(callback)
 end
 
 function Mob:on_step(dtime, moveresult)
+    local action_queue = self.action_queue
+
+    if action_queue:size() > 0 then
+        action_queue:pop()(dtime)
+    end
+
+    local state_queue = self.state_queue
+
+    if state_queue:size() == 0 then
+        self.state = "stand"
+        state_queue:set_priority("stand", 0)
+
+    else
+        self.state = state_queue:peek()
+    end
+
     local callbacks = self._on_steps
     for i = 1, #callbacks do
         callbacks[i](self, dtime, moveresult)
@@ -210,39 +245,6 @@ function Mob:register_on_detach(callback)
     table.insert(self._on_detaches, callback)
 end
 
---local object_property = {
---    hp_max = true,
---    physical = true,
---    collide_with_objects = true,
---    collisionbox = true,
---    selectionbox = true,
---    pointable = true,
---    visual = true,
---    visual_size = true,
---    mesh = true,
---    textures = true,
---    colors = true,
---    use_texture_alpha = true,
---    spritediv = true,
---    initial_sprite_basepos = true,
---    is_visible = true,
---    makes_footstep_sound = true,
---    automatic_rotate = true,
---    stepheight = true,
---    automatic_face_movement_dir = true,
---    automatic_face_movement_max_rotation_per_sec = true,
---    backface_culling = true,
---    glow = true,
---    nametag = true,
---    nametag_color = true,
---    nametag_bgcolor = true,
---    infotext = true,
---    static_save = true,
---    damage_texture_modifier = true,
---    shaded = true,
---    show_on_minimap = true,
---}
-
 function Mob:register_attribute(key, initializer, serializer)
     local attributes = self.attributes
 
@@ -256,6 +258,13 @@ function Mob:register_attribute(key, initializer, serializer)
     }
 end
 
+function Mob:has_attribute(key)
+    return self.attributes[key] ~= nil
+end
+
+-- traits are "allowed" to read/write their own attributes via self.key directly.
+-- or if they want to store an ephemeral attribute like a "target" object
+-- however, they should use get_attribute/set_attribute if they want to modify someone else's traits
 function Mob:get_attribute(key)
     local def = self.attributes[key]
     if not def then
@@ -270,6 +279,50 @@ function Mob:set_attribute(key, value)
         error(("attempt to get unknown attribute %q of mob %s"):format(key, dump(self)))
     end
     self[key] = value
+end
+
+function Mob:get_attributes()
+    local attributes = {}
+
+    for key, funcs in pairs(self.attributes) do
+        attributes[key] = funcs.serializer(self[key])
+    end
+
+    return attributes
+end
+
+function Mob:get_property(key)
+    if not is_property_key(key) then
+        error(f("unknown property %s", key))
+    end
+
+    local o = self.object
+    if not o then
+        return
+    end
+
+    local properties = o:get_properties()
+    if not properties then
+        return
+    end
+
+    return properties[key]
+end
+
+function Mob:set_property(key, value)
+    if not is_property_key(key) then
+        error(f("unknown property %s", key))
+
+    elseif not is_valid_property_value(key, value) then
+        error(f("invalid property value %s = %s", key, dump(value)))
+    end
+
+    local o = self.object
+    if not o and o.set_properties then
+        return
+    end
+
+    o:set_properties({[key] = value})
 end
 
 api.Mob = Mob

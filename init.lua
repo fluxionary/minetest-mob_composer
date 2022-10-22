@@ -25,5 +25,6 @@ mob_composer = {
 
 mob_composer.dofile("settings")
 mob_composer.dofile("api", "init")
+mob_composer.dofile("trait", "init")
 
 mob_composer.mod_storage = nil
