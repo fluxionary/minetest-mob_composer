@@ -1,5 +1,7 @@
+local private_state = {}
+local mod_storage = private_state.mod_storage
+
 local api = mob_composer.api
-local mod_storage = mob_composer.mod_storage
 
 local updated = false
 local id = mod_storage:get_int("id")

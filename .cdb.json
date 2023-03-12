@@ -1,0 +1,11 @@
+{
+    "type": "MOD",
+    "name": "mob_composer",
+    "title": "mob composer",
+    "short_description": "an extensible mob API",
+    "repo": "https://github.com/fluxionary/minetest-mob_composer.git",
+    "website": "https://github.com/fluxionary/minetest-mob_composer",
+    "issue_tracker": "https://github.com/fluxionary/minetest-mob_composer/issues",
+    "license": "AGPL-3.0-or-later",
+    "media_license": "CC-BY-SA-4.0"
+}
